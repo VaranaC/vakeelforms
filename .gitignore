@@ -1,7 +1,26 @@
+# Python & FastAPI
 .env
 venv/
 __pycache__/
 *.pyc
 *.db
 .DS_Store
+
+# Node & React Native
 node_modules/
+.expo/
+.expo-shared/
+*.log
+
+# Expo build artifacts
+*.apk
+*.aab
+*.ipa
+*.tar.gz
+
+# Ignore all large AI training/model data
+backend/ai_trainer/model/output/
+backend/ai_trainer/datasets/raw/
+backend/ai_trainer/datasets/processed/combined_legal_qa.jsonl
+backend/ai_trainer/datasets/processed/bare_acts_qa.jsonl
+backend/ai_trainer/datasets/processed/indic_legal_qa_cleaned.jsonl
