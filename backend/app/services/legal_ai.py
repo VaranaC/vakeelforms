@@ -1,24 +1,22 @@
-import requests
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import torch
 
-async def get_legal_explanation(text: str):
+# Load once on first import
+tokenizer = AutoTokenizer.from_pretrained("app/ai_model/fine_tuned")
+model = AutoModelForSeq2SeqLM.from_pretrained("app/ai_model/fine_tuned")
+
+def get_legal_explanation(text: str) -> str:
     try:
-        response = requests.post(
-            "https://api-inference.huggingface.co/models/nbroad/tiny-random-bert",
-            headers={"Content-Type": "application/json"},
-            json={"inputs": f"Explain this legal text: {text}"}
-        )
+        input_ids = tokenizer(
+            f"Explain this legal text: {text}",
+            return_tensors="pt",
+            truncation=True,
+            max_length=512
+        ).input_ids
 
-        result = response.json()
+        output = model.generate(input_ids, max_new_tokens=256)
+        explanation = tokenizer.decode(output[0], skip_special_tokens=True)
 
-        # ✅ Handle list response
-        if isinstance(result, list) and len(result) > 0:
-            return result[0].get("generated_text", "✅ Flow works — dummy explanation.")
-
-        # ✅ Handle error dict
-        elif isinstance(result, dict) and "error" in result:
-            return f"⚠️ AI Error: {result['error']}"
-
-        return "⚠️ Unexpected response from AI model."
-
+        return explanation
     except Exception as e:
-        return f"🚨 Exception during AI call: {str(e)}"
+        return f"⚠️ AI Error: {str(e)}"
