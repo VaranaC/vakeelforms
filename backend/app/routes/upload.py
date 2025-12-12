@@ -6,18 +6,15 @@ from app.services.auth import get_current_user
 router = APIRouter()
 
 @router.post("/")
-async def upload_and_explain(
-    file: UploadFile = File(...),
-    user: str = Depends(get_current_user)  # user is just a string
-):
+async def upload_and_explain(file: UploadFile = File(...), user: str = Depends(get_current_user)):
+    print("✅ Upload by user:", user)
+    extracted_text = await extract_text(file)
     try:
-        print("✅ Upload by user:", user)
-        extracted_text = await extract_text(file)
-        explanation = await get_legal_explanation(extracted_text)
-        return {
-            "extracted_text": extracted_text,
-            "explanation": explanation
-        }
+        explanation = get_legal_explanation(extracted_text)  # ⬅️ FIXED (removed await)
     except Exception as e:
-        print("🚨 Exception during upload:", str(e))
-        return {"error": str(e)}
+        return {"error": f"🚨 Exception during upload: {str(e)}"}
+
+    return {
+        "extracted_text": extracted_text,
+        "explanation": explanation
+    }

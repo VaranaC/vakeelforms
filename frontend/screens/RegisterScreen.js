@@ -1,4 +1,3 @@
- 
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import axios from 'axios';
@@ -10,19 +9,35 @@ export default function RegisterScreen({ navigation }) {
 
   const handleRegister = async () => {
     try {
-      await axios.post(`${BASE_URL}/api/v1/auth/register`, { username, password });
+      const res = await axios.post(`${BASE_URL}/api/v1/auth/register`, { username, password });
       Alert.alert('Success', 'Now login!');
       navigation.replace('Login');
     } catch (err) {
-      Alert.alert('Register failed', 'Try another username');
+      console.log('❌ Register error:', err?.response?.data || err.message);
+      Alert.alert(
+        'Register failed',
+        err?.response?.data?.detail || err?.response?.data?.error || err.message
+      );
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
-      <TextInput placeholder="Username" value={username} onChangeText={setUsername} style={styles.input} />
-      <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />
+      <TextInput
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+        style={styles.input}
+        autoCapitalize="none"
+      />
+      <TextInput
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        style={styles.input}
+      />
       <Button title="Register" onPress={handleRegister} />
       <Button title="Back to Login" onPress={() => navigation.navigate('Login')} />
     </View>
